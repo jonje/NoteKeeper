@@ -38,6 +38,10 @@ public class NoteFragment extends Fragment {
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spinnerCourses.setAdapter(adapterCourses);
         if (noteInfo != null) {
+
+            int courseIndex = courses.indexOf(noteInfo.getCourse());
+            binding.spinnerCourses.setSelection(courseIndex);
+
             binding.textNoteTitle.setText(noteInfo.getTitle());
             binding.textNoteText.setText(noteInfo.getText());
 

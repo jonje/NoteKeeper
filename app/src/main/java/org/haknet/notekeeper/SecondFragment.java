@@ -58,6 +58,11 @@ public class SecondFragment extends Fragment {
             SecondFragmentDirections.ActionNoteListToNote action = SecondFragmentDirections.actionNoteListToNote(noteInfo);
             Navigation.findNavController(view).navigate(action);
         });
+
+        binding.addNote.setOnClickListener(view -> {
+            SecondFragmentDirections.ActionNoteListToNote action = SecondFragmentDirections.actionNoteListToNote(null);
+            Navigation.findNavController(view).navigate(action);
+        });
     }
 
     @Override
