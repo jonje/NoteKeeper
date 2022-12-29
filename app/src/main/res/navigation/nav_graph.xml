@@ -15,9 +15,8 @@
             android:id="@+id/action_note_to_notelist"
             app:destination="@id/NoteListFragment" />
         <argument
-            android:name="noteInfo"
-            app:argType="org.haknet.notekeeper.NoteInfo"
-            app:nullable="true" />
+            android:name="notePosition"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/NoteListFragment"

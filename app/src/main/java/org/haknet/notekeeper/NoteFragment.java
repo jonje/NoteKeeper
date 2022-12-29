@@ -17,6 +17,7 @@ import java.util.List;
 public class NoteFragment extends Fragment {
 
     private FragmentNoteBinding binding;
+    private static final int POSITION_NOT_SET = -1;
 
     @Override
     public View onCreateView(
@@ -31,14 +32,14 @@ public class NoteFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        NoteInfo noteInfo = NoteFragmentArgs.fromBundle(getArguments()).getNoteInfo();
+        int notePosition = NoteFragmentArgs.fromBundle(getArguments()).getNotePosition();
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         ArrayAdapter<CourseInfo> adapterCourses =
                 new ArrayAdapter<>(this.getContext(), android.R.layout.simple_spinner_item, courses);
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spinnerCourses.setAdapter(adapterCourses);
-        if (noteInfo != null) {
-
+        if (POSITION_NOT_SET != notePosition) {
+            NoteInfo noteInfo = DataManager.getInstance().getNotes().get(notePosition);
             int courseIndex = courses.indexOf(noteInfo.getCourse());
             binding.spinnerCourses.setSelection(courseIndex);
 

@@ -55,12 +55,12 @@ public class SecondFragment extends Fragment {
 
         binding.listNotes.setOnItemClickListener((adapterView, view, position, l) -> {
             NoteInfo noteInfo = (NoteInfo) listNotes.getItemAtPosition(position);
-            SecondFragmentDirections.ActionNoteListToNote action = SecondFragmentDirections.actionNoteListToNote(noteInfo);
+            SecondFragmentDirections.ActionNoteListToNote action = SecondFragmentDirections.actionNoteListToNote(position);
             Navigation.findNavController(view).navigate(action);
         });
 
         binding.addNote.setOnClickListener(view -> {
-            SecondFragmentDirections.ActionNoteListToNote action = SecondFragmentDirections.actionNoteListToNote(null);
+            SecondFragmentDirections.ActionNoteListToNote action = SecondFragmentDirections.actionNoteListToNote(-1);
             Navigation.findNavController(view).navigate(action);
         });
     }
