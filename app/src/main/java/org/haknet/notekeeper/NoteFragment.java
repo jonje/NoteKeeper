@@ -13,14 +13,21 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+
 import org.haknet.notekeeper.databinding.FragmentNoteBinding;
 
 import java.util.List;
+import java.util.Objects;
 
 public class NoteFragment extends Fragment {
 
     private FragmentNoteBinding binding;
     private static final int POSITION_NOT_SET = -1;
+    private NoteInfo noteInfo;
+    private int notePosition;
+    private boolean isCancelling;
+    private boolean isNewNote;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,14 +54,17 @@ public class NoteFragment extends Fragment {
                 new ArrayAdapter<>(this.getContext(), android.R.layout.simple_spinner_item, courses);
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spinnerCourses.setAdapter(adapterCourses);
-        if (POSITION_NOT_SET != notePosition) {
-            NoteInfo noteInfo = DataManager.getInstance().getNotes().get(notePosition);
+        isNewNote = POSITION_NOT_SET == notePosition;
+        if (!isNewNote) {
+            noteInfo = DataManager.getInstance().getNotes().get(notePosition);
             int courseIndex = courses.indexOf(noteInfo.getCourse());
             binding.spinnerCourses.setSelection(courseIndex);
 
             binding.textNoteTitle.setText(noteInfo.getTitle());
             binding.textNoteText.setText(noteInfo.getText());
 
+        } else {
+            createNewNote();
         }
 
 //        binding.buttonFirst.setOnClickListener(new View.OnClickListener() {
@@ -64,6 +74,12 @@ public class NoteFragment extends Fragment {
 //                        .navigate(R.id.action_FirstFragment_to_SecondFragment);
 //            }
 //        });
+    }
+
+    private void createNewNote() {
+        DataManager dm = DataManager.getInstance();
+        notePosition = dm.createNewNote();
+        noteInfo = dm.getNotes().get(notePosition);
     }
 
     @Override
@@ -79,6 +95,10 @@ public class NoteFragment extends Fragment {
         if (id == R.id.action_send_mail) {
             sendEmail();
             return true;
+        } else if (id == R.id.action_cancel) {
+            isCancelling = true;
+            // Used to navigate up the stack to the previous fragment.
+            NavHostFragment.findNavController(NoteFragment.this).navigateUp();
         }
 
 
@@ -97,6 +117,26 @@ public class NoteFragment extends Fragment {
         startActivity(intent);
 
     }
+
+    private void saveNote() {
+        this.noteInfo.setCourse((CourseInfo) this.binding.spinnerCourses.getSelectedItem());
+        this.noteInfo.setTitle(this.binding.textNoteTitle.getText().toString());
+        this.noteInfo.setText(this.binding.textNoteText.getText().toString());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (!isCancelling) {
+            saveNote();
+        } else {
+            if (isNewNote) {
+                DataManager.getInstance().removeNote(notePosition);
+            }
+        }
+    }
+
+
 
     @Override
     public void onDestroyView() {
