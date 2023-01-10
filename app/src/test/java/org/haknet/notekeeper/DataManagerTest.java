@@ -1,26 +1,29 @@
 package org.haknet.notekeeper;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
-class DataManagerTest {
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+
+public class DataManagerTest {
     static DataManager dataManager;
 
-    @BeforeAll
+    @BeforeClass
     public static void classSetUp() {
         dataManager = DataManager.getInstance();
     }
 
-    @BeforeEach
+    @Before
     public void setup() {
         dataManager.getNotes().clear();
         dataManager.initializeExampleNotes();
     }
 
     @Test
-    void createNewNote() {
+    public void createNewNote() {
         final CourseInfo courseInfo = dataManager.getCourse("android_async");
         final String noteTitle = "Test note title";
         final String noteText = "This is the body text of the note.";
@@ -38,7 +41,7 @@ class DataManagerTest {
     }
 
     @Test
-    void createNewNoteOneStepCreation() {
+    public void createNewNoteOneStepCreation() {
         final CourseInfo courseInfo = dataManager.getCourse("android_async");
         final String noteTitle = "Test not title";
         final String noteText = "Test note body";

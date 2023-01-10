@@ -18,7 +18,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import org.haknet.notekeeper.databinding.FragmentNoteBinding;
 
 import java.util.List;
-import java.util.Objects;
 
 public class NoteFragment extends Fragment {
 
