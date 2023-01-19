@@ -1,5 +1,6 @@
 package org.haknet.notekeeper;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +15,8 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.haknet.notekeeper.databinding.FragmentNoteListBinding;
 
@@ -47,17 +50,22 @@ public class SecondFragment extends Fragment {
     }
 
     private void initializeDisplayContent() {
-        final ListView listNotes = this.binding.listNotes;
-        List<NoteInfo> notes = DataManager.getInstance().getNotes();
-        ArrayAdapter<NoteInfo> arrayAdapter =
-                new ArrayAdapter<>(this.getContext(), android.R.layout.simple_list_item_1, notes);
-        binding.listNotes.setAdapter(arrayAdapter);
+        final Context context = this.getContext();
+        final RecyclerView listNotes = this.binding.listNotes;
+        final LinearLayoutManager notesLayoutManager = new LinearLayoutManager(context);
+        listNotes.setLayoutManager(notesLayoutManager);
 
-        binding.listNotes.setOnItemClickListener((adapterView, view, position, l) -> {
-            NoteInfo noteInfo = (NoteInfo) listNotes.getItemAtPosition(position);
-            SecondFragmentDirections.ActionNoteListToNote action = SecondFragmentDirections.actionNoteListToNote(position);
-            Navigation.findNavController(view).navigate(action);
-        });
+        List<NoteInfo> notes = DataManager.getInstance().getNotes();
+
+        final NoteRecyclerViewAdapter noteRecyclerViewAdapter = new NoteRecyclerViewAdapter(context, notes);
+        listNotes.setAdapter(noteRecyclerViewAdapter);
+//        binding.listNotes.setAdapter(arrayAdapter);
+//
+//        binding.listNotes.setOnItemClickListener((adapterView, view, position, l) -> {
+//            NoteInfo noteInfo = (NoteInfo) listNotes.getItemAtPosition(position);
+//            SecondFragmentDirections.ActionNoteListToNote action = SecondFragmentDirections.actionNoteListToNote(position);
+//            Navigation.findNavController(view).navigate(action);
+//        });
 
         binding.addNote.setOnClickListener(view -> {
             SecondFragmentDirections.ActionNoteListToNote action = SecondFragmentDirections.actionNoteListToNote(-1);
