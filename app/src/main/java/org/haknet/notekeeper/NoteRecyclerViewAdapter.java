@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
         NoteInfo noteInfo = this.notes.get(position);
         holder.textCourse.setText(noteInfo.getCourse().getTitle());
         holder.textTitle.setText(noteInfo.getTitle());
+        holder.currentPosition = position;
 
     }
 
@@ -48,11 +50,16 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
 
         public final TextView textCourse;
         public final TextView textTitle;
+        public int currentPosition;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             textCourse = (TextView) itemView.findViewById(R.id.text_course);
             textTitle = (TextView) itemView.findViewById(R.id.text_title);
+            itemView.setOnClickListener(v -> {
+                SecondFragmentDirections.ActionNoteListToNote action = SecondFragmentDirections.actionNoteListToNote(currentPosition);
+                Navigation.findNavController(v).navigate(action);
+            });
         }
     }
 }

@@ -25,6 +25,7 @@ import java.util.List;
 public class SecondFragment extends Fragment {
 
     private FragmentNoteListBinding binding;
+    private NoteRecyclerViewAdapter noteRecyclerViewAdapter;
 
     @Override
     public View onCreateView(
@@ -57,7 +58,7 @@ public class SecondFragment extends Fragment {
 
         List<NoteInfo> notes = DataManager.getInstance().getNotes();
 
-        final NoteRecyclerViewAdapter noteRecyclerViewAdapter = new NoteRecyclerViewAdapter(context, notes);
+        noteRecyclerViewAdapter = new NoteRecyclerViewAdapter(context, notes);
         listNotes.setAdapter(noteRecyclerViewAdapter);
 //        binding.listNotes.setAdapter(arrayAdapter);
 //
@@ -71,6 +72,12 @@ public class SecondFragment extends Fragment {
             SecondFragmentDirections.ActionNoteListToNote action = SecondFragmentDirections.actionNoteListToNote(-1);
             Navigation.findNavController(view).navigate(action);
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        this.noteRecyclerViewAdapter.notifyDataSetChanged();
     }
 
     @Override
