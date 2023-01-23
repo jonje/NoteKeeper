@@ -29,6 +29,8 @@ public class NoteFragment extends Fragment {
     private int notePosition;
     private boolean isCancelling;
     private boolean isNewNote;
+    private MenuHost menuHost;
+    private MenuProvider menuProvider;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,8 +50,8 @@ public class NoteFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        MenuHost menuHost = requireActivity();
-        menuHost.addMenuProvider(new MenuProvider() {
+        menuHost = requireActivity();
+        menuProvider = new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
                 menuInflater.inflate(R.menu.menu_main, menu);
@@ -67,10 +69,22 @@ public class NoteFragment extends Fragment {
                     isCancelling = true;
                     // Used to navigate up the stack to the previous fragment.
                     NavHostFragment.findNavController(NoteFragment.this).navigateUp();
+                } else if (id == R.id.action_next) {
+                    moveNext();
                 }
                 return false;
             }
-        });
+
+            @Override
+            public void onPrepareMenu(@NonNull Menu menu) {
+                MenuItem menuItem = menu.findItem(R.id.action_next);
+                int lastNoteIndex = DataManager.getInstance().getNotes().size() -1;
+                menuItem.setEnabled(notePosition < lastNoteIndex);
+                MenuProvider.super.onPrepareMenu(menu);
+            }
+        };
+
+        menuHost.addMenuProvider(menuProvider);
 
         int notePosition = NoteFragmentArgs.fromBundle(getArguments()).getNotePosition();
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
@@ -79,13 +93,10 @@ public class NoteFragment extends Fragment {
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spinnerCourses.setAdapter(adapterCourses);
         isNewNote = POSITION_NOT_SET == notePosition;
+
         if (!isNewNote) {
             noteInfo = DataManager.getInstance().getNotes().get(notePosition);
-            int courseIndex = courses.indexOf(noteInfo.getCourse());
-            binding.spinnerCourses.setSelection(courseIndex);
-
-            binding.textNoteTitle.setText(noteInfo.getTitle());
-            binding.textNoteText.setText(noteInfo.getText());
+            displayNote();
 
         } else {
             createNewNote();
@@ -98,6 +109,23 @@ public class NoteFragment extends Fragment {
 //                        .navigate(R.id.action_FirstFragment_to_SecondFragment);
 //            }
 //        });
+    }
+
+    private void moveNext() {
+        saveNote();
+        ++notePosition;
+        noteInfo = DataManager.getInstance().getNotes().get(notePosition);
+        displayNote();
+        this.menuHost.invalidateMenu();
+    }
+
+    private void displayNote() {
+        List<CourseInfo> courses = DataManager.getInstance().getCourses();
+        int courseIndex = courses.indexOf(noteInfo.getCourse());
+        binding.spinnerCourses.setSelection(courseIndex);
+
+        binding.textNoteTitle.setText(noteInfo.getTitle());
+        binding.textNoteText.setText(noteInfo.getText());
     }
 
     private void createNewNote() {
@@ -137,12 +165,14 @@ public class NoteFragment extends Fragment {
         }
     }
 
-
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+
+        if (this.menuHost != null) {
+            this.menuHost.removeMenuProvider(this.menuProvider);
+        }
     }
 
 }
